@@ -46,10 +46,18 @@ jobs:
             ~/.cache/go-build/
             ~/go/pkg/mod/
           key: ${{ hashFiles('go.sum') }}
+      - uses: release-drafter/release-drafter@v5
+        id: release-draft
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          commitish: "${{ github.ref }}"
       - name: Setup git config as weaveworksbot
         run: |
           git config user.name "weaveworksbot"
           git config user.email "weaveworksbot@users.noreply.github.com"
+          echo "${{ steps.release-draft.outputs.body }}" > release-draft.md
+          cat release-draft.md
           echo "${{ secrets.WEAVEWORKSBOT_TOKEN }}" | gh auth login --with-token
-      - name: Open PRs to release branch and default branch
-        run: make prepare-release-candidate
+          #- name: Open PRs to release branch and default branch
+          #run: make prepare-release-candidate

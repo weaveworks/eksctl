@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go/service/autoscaling/autoscalingiface"
@@ -31,8 +32,8 @@ const (
 	resourcesRootPath = "Resources"
 	outputsRootPath   = "Outputs"
 	mappingsRootPath  = "Mappings"
-	ourStackRegexFmt  = "^(eksctl|EKS)-%s-((cluster|nodegroup-.+|addon-.+|fargate)|(VPC|ServiceRole|ControlPlane|DefaultNodeGroup))$"
-	clusterStackRegex = "eksctl-.*-cluster"
+	ourStackRegexFmt  = "^(eksctl|EKS|%s)-%s-((cluster|nodegroup-.+|addon-.+|fargate)|(VPC|ServiceRole|ControlPlane|DefaultNodeGroup))$"
+	clusterStackRegex = ".*-.*-cluster"
 )
 
 var (
@@ -82,6 +83,7 @@ type StackCollection struct {
 	region            string
 	waitTimeout       time.Duration
 	sharedTags        []*cloudformation.Tag
+	StackPrefix       string
 }
 
 func newTag(key, value string) *cloudformation.Tag {
@@ -380,7 +382,7 @@ func (c *StackCollection) ListClusterStackNames() ([]string, error) {
 
 // ListStacks gets all of CloudFormation stacks
 func (c *StackCollection) ListStacks(statusFilters ...string) ([]*Stack, error) {
-	return c.ListStacksMatching(fmtStacksRegexForCluster(c.spec.Metadata.Name), statusFilters...)
+	return c.ListStacksMatching(fmtStacksRegexForCluster(c.spec.Metadata.StackPrefix, c.spec.Metadata.Name), statusFilters...)
 }
 
 // StackStatusIsNotTransitional will return true when stack status is non-transitional
@@ -539,8 +541,10 @@ func (c *StackCollection) DeleteStackBySpecSync(s *Stack, errs chan error) error
 	return nil
 }
 
-func fmtStacksRegexForCluster(name string) string {
-	return fmt.Sprintf(ourStackRegexFmt, name)
+func fmtStacksRegexForCluster(stackPrefix string, name string) string {
+	replacedStackPrefix := strings.Replace(stackPrefix, "_", "-", -1)
+	replacedName := strings.Replace(name, "_", "-", -1)
+	return fmt.Sprintf(ourStackRegexFmt, replacedStackPrefix, replacedName)
 }
 
 // DescribeStacks describes the existing stacks

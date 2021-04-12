@@ -49,7 +49,8 @@ type NodeGroupStack struct {
 
 // makeNodeGroupStackName generates the name of the nodegroup stack identified by its name, isolated by the cluster this StackCollection operates on
 func (c *StackCollection) makeNodeGroupStackName(name string) string {
-	return fmt.Sprintf("eksctl-%s-nodegroup-%s", c.spec.Metadata.Name, name)
+	stackName := fmt.Sprintf("%s-%s-nodegroup-%s", c.spec.Metadata.StackPrefix, c.spec.Metadata.Name, name)
+	return strings.Replace(stackName, "_", "-", -1)
 }
 
 // createNodeGroupTask creates the nodegroup

@@ -464,6 +464,11 @@
           "description": "the AWS region hosting this cluster",
           "x-intellij-html-description": "the AWS region hosting this cluster"
         },
+        "stackPrefix": {
+          "type": "string",
+          "description": "used to prefix all stacks created by `eksctl`.",
+          "x-intellij-html-description": "used to prefix all stacks created by <code>eksctl</code>."
+        },
         "tags": {
           "additionalProperties": {
             "type": "string"
@@ -493,7 +498,8 @@
         "region",
         "version",
         "tags",
-        "annotations"
+        "annotations",
+        "stackPrefix"
       ],
       "additionalProperties": false,
       "description": "contains general cluster information",

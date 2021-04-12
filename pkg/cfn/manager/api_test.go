@@ -60,8 +60,8 @@ var _ = Describe("StackCollection", func() {
 		// 5) ExecuteChangeSet
 		// 6) DescribeStacksRequest (until UPDATE_COMPLETE)
 
-		clusterName := "clusteur"
-		stackName := "eksctl-stack"
+		clusterName := "my_cluster"
+		stackName := "eksctl-my-cluster"
 		changeSetName := "eksctl-changeset"
 		describeInput := &cfn.DescribeStacksInput{StackName: &stackName}
 		existingTag := &cfn.Tag{

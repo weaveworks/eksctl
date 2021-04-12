@@ -1,6 +1,9 @@
 package fargate
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/kris-nova/logger"
 	"github.com/pkg/errors"
 	api "github.com/weaveworks/eksctl/pkg/apis/eksctl.io/v1alpha5"
@@ -17,8 +20,9 @@ type createFargateStackTask struct {
 
 func (t *createFargateStackTask) Describe() string { return "create fargate IAM stacK" }
 
-func makeClusterStackName(clusterName string) string {
-	return "eksctl-" + clusterName + "-fargate"
+func makeClusterStackName(stackPrefix string, clusterName string) string {
+	stackName := fmt.Sprintf("%s-%s-fargate", stackPrefix, clusterName)
+	return strings.Replace(stackName, "_", "-", -1)
 }
 
 func (t *createFargateStackTask) Do(errs chan error) error {
@@ -26,7 +30,7 @@ func (t *createFargateStackTask) Do(errs chan error) error {
 	if err := rs.AddAllResources(); err != nil {
 		return errors.Wrap(err, "couldn't add all resources to fargate resource set")
 	}
-	return t.stackManager.CreateStack(makeClusterStackName(t.cfg.Metadata.Name), rs, nil, nil, errs)
+	return t.stackManager.CreateStack(makeClusterStackName(t.cfg.Metadata.StackPrefix, t.cfg.Metadata.Name), rs, nil, nil, errs)
 }
 
 // ensureFargateRoleStackExists creates fargate IAM resources if they

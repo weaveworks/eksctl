@@ -44,7 +44,7 @@ var _ = Describe("Fargate", func() {
 			},
 		}
 
-		clusterName = "my-cluster"
+		clusterName = "my_cluster"
 		cfg.Metadata.Name = clusterName
 
 		fargateManager = fargate.New(cfg, &eks.ClusterProvider{Provider: mockProvider, Status: &eks.ProviderStatus{}}, fakeStackManager)

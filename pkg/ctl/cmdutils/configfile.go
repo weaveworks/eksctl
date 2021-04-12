@@ -118,6 +118,10 @@ func (l *commonClusterConfigLoader) Load() error {
 	}
 	l.ProviderConfig.Region = meta.Region
 
+	if meta.StackPrefix == "" {
+		meta.StackPrefix = "eksctl"
+	}
+
 	api.SetDefaultGitSettings(l.ClusterConfig)
 	return l.validateWithConfigFile()
 }
@@ -144,6 +148,10 @@ func validateMetadataWithoutConfigFile(cmd *Cmd) error {
 
 	if meta.Name == "" {
 		return ErrMustBeSet(ClusterNameFlag(cmd))
+	}
+
+	if meta.StackPrefix == "" {
+		meta.StackPrefix = "eksctl"
 	}
 
 	return nil

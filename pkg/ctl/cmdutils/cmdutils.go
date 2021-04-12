@@ -168,6 +168,11 @@ func AddVersionFlag(fs *pflag.FlagSet, meta *api.ClusterMeta, extraUsageInfo str
 	fs.StringVar(&meta.Version, "version", meta.Version, usage)
 }
 
+// AddStackPrefixFlag adds common --stack-prefix flag
+func AddStackPrefixFlag(fs *pflag.FlagSet, stackPrefix *string) {
+	fs.StringVarP(stackPrefix, "stack-prefix", "", "eksctl", "prefix to use for CloudFormation stacks")
+}
+
 // AddWaitFlag adds common --wait flag
 func AddWaitFlag(fs *pflag.FlagSet, wait *bool, description string) {
 	AddWaitFlagWithFullDescription(fs, wait, fmt.Sprintf("wait for %s before exiting", description))

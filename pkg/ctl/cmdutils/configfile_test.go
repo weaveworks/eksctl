@@ -118,6 +118,41 @@ var _ = Describe("cmdutils configfile", func() {
 			})
 		})
 
+		// Describe("stack prefix", func() {
+		// 	When("provided", func() {
+		// 		It("succeeds", func() {
+		// 			cfg := api.NewClusterConfig()
+		// 			cmd := &Cmd{
+		// 				ClusterConfig:     cfg,
+		// 				CobraCommand:      newCmd(),
+		// 				ClusterConfigFile: "test_data/cluster-with-stack-prefix.yaml",
+		// 				ProviderConfig:    api.ProviderConfig{},
+		// 			}
+		// 			l := newCommonClusterConfigLoader(cmd)
+
+		// 			err := l.Load()
+		// 			Expect(err).ToNot(HaveOccurred())
+		// 			Expect(l.ClusterConfig.Metadata.StackPrefix).To(Equal("foo-3"))
+		// 		})
+		// 	})
+		// 	When("not provided", func() {
+		// 		It("uses the default value", func() {
+		// 			cfg := api.NewClusterConfig()
+		// 			cmd := &Cmd{
+		// 				ClusterConfig:     cfg,
+		// 				CobraCommand:      newCmd(),
+		// 				ClusterConfigFile: examplesDir + "01-simple-cluster.yaml",
+		// 				ProviderConfig:    api.ProviderConfig{},
+		// 			}
+		// 			l := newCommonClusterConfigLoader(cmd)
+
+		// 			err := l.Load()
+		// 			Expect(err).ToNot(HaveOccurred())
+		// 			Expect(l.ClusterConfig.Metadata.StackPrefix).To(Equal("eksctl"))
+		// 		})
+		// 	})
+		// })
+
 		It("load all of example file", func() {
 			examples, err := filepath.Glob(examplesDir + "*.yaml")
 			Expect(err).ToNot(HaveOccurred())

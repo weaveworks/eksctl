@@ -494,6 +494,11 @@ func (in *ClusterMeta) DeepCopyInto(out *ClusterMeta) {
 			(*out)[key] = val
 		}
 	}
+	if in.StackPrefix != nil {
+		in, out := &in.StackPrefix, &out.StackPrefix
+		*out = new(string)
+		**out = **in
+	}
 	return
 }
 

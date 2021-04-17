@@ -340,7 +340,7 @@ const expected = `
 		"name": "test-3x3-ngs",
 		"region": "eu-central-1",
 		"version": "1.19",
-		"stackPrefix": "eksctl"
+		"stackPrefix": "eksctl-"
 	},
 	"iam": {
 		"withOIDC": false

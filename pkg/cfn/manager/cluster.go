@@ -23,7 +23,12 @@ func (c *StackCollection) MakeChangeSetName(action string) string {
 }
 
 func (c *StackCollection) MakeClusterStackName() string {
-	stackName := fmt.Sprintf("%s-%s-cluster", c.spec.Metadata.StackPrefix, c.spec.Metadata.Name)
+	stackName := fmt.Sprintf("%s-cluster", c.spec.Metadata.Name)
+	if c.spec.Metadata.StackPrefix == nil {
+		stackName = api.DefaultStackPrefix + stackName
+	} else {
+		stackName = *c.spec.Metadata.StackPrefix + stackName
+	}
 	return strings.Replace(stackName, "_", "-", -1)
 }
 

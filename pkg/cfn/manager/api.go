@@ -32,8 +32,8 @@ const (
 	resourcesRootPath = "Resources"
 	outputsRootPath   = "Outputs"
 	mappingsRootPath  = "Mappings"
-	ourStackRegexFmt  = "^(eksctl|EKS|%s)-%s-((cluster|nodegroup-.+|addon-.+|fargate)|(VPC|ServiceRole|ControlPlane|DefaultNodeGroup))$"
-	clusterStackRegex = ".*-.*-cluster"
+	ourStackRegexFmt  = "^((eksctl|EKS)-%s)%s-((cluster|nodegroup-.+|addon-.+|fargate)|(VPC|ServiceRole|ControlPlane|DefaultNodeGroup))$"
+	clusterStackRegex = ".*-cluster"
 )
 
 var (
@@ -83,7 +83,6 @@ type StackCollection struct {
 	region            string
 	waitTimeout       time.Duration
 	sharedTags        []*cloudformation.Tag
-	StackPrefix       string
 }
 
 func newTag(key, value string) *cloudformation.Tag {
@@ -541,10 +540,13 @@ func (c *StackCollection) DeleteStackBySpecSync(s *Stack, errs chan error) error
 	return nil
 }
 
-func fmtStacksRegexForCluster(stackPrefix string, name string) string {
-	replacedStackPrefix := strings.Replace(stackPrefix, "_", "-", -1)
-	replacedName := strings.Replace(name, "_", "-", -1)
-	return fmt.Sprintf(ourStackRegexFmt, replacedStackPrefix, replacedName)
+func fmtStacksRegexForCluster(stackPrefix *string, name string) string {
+	ourStackPrefix := ""
+	if stackPrefix != nil {
+		ourStackPrefix = "|" + *stackPrefix
+	}
+	ourStackRegex := fmt.Sprintf(ourStackRegexFmt, ourStackPrefix, name)
+	return strings.Replace(ourStackRegex, "_", "-", -1)
 }
 
 // DescribeStacks describes the existing stacks

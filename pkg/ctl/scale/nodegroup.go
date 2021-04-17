@@ -31,7 +31,7 @@ func scaleNodeGroupWithRunFunc(cmd *cmdutils.Cmd, runFunc func(cmd *cmdutils.Cmd
 	cmd.FlagSetGroup.InFlagSet("General", func(fs *pflag.FlagSet) {
 		fs.StringVar(&cfg.Metadata.Name, "cluster", "", "EKS cluster name")
 		fs.StringVarP(&ng.Name, "name", "n", "", "Name of the nodegroup to scale")
-		cmdutils.AddStackPrefixFlag(fs, &cfg.Metadata.StackPrefix)
+		cmdutils.AddStackPrefixFlag(fs, cfg.Metadata.StackPrefix)
 		cmdutils.AddConfigFileFlag(fs, &cmd.ClusterConfigFile)
 
 		desiredCapacity := fs.IntP("nodes", "N", -1, "desired number of nodes (required)")

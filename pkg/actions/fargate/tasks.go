@@ -20,8 +20,13 @@ type createFargateStackTask struct {
 
 func (t *createFargateStackTask) Describe() string { return "create fargate IAM stacK" }
 
-func makeClusterStackName(stackPrefix string, clusterName string) string {
-	stackName := fmt.Sprintf("%s-%s-fargate", stackPrefix, clusterName)
+func makeClusterStackName(stackPrefix *string, clusterName string) string {
+	stackName := fmt.Sprintf("%s-fargate", clusterName)
+	if stackPrefix == nil {
+		stackName = api.DefaultStackPrefix + stackName
+	} else {
+		stackName = *stackPrefix + stackName
+	}
 	return strings.Replace(stackName, "_", "-", -1)
 }
 

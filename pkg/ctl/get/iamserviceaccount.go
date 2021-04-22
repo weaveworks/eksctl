@@ -38,7 +38,7 @@ func getIAMServiceAccountCmd(cmd *cmdutils.Cmd) {
 		fs.StringVar(&name, "name", "", "name of iamserviceaccount to get")
 
 		cmdutils.AddRegionFlag(fs, &cmd.ProviderConfig)
-		cmdutils.AddStackPrefixFlag(fs, cfg.Metadata.StackPrefix)
+		cmdutils.AddDisableStackPrefixFlag(fs, &cfg.Metadata.DisableStackPrefix)
 		cmdutils.AddConfigFileFlag(fs, &cmd.ClusterConfigFile)
 
 		cmdutils.AddCommonFlagsForGetCmd(fs, &params.chunkSize, &params.output)

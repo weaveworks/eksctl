@@ -142,11 +142,11 @@ eksctl create cluster --tags environment=staging --region=us-east-1
 
 ### CloudFormation stack prefixing
 
-To replace the default `eksctl-` prefix for CloudFormation stacks, use `--stack-prefix`.
+To disable usage of the `eksctl-` prefix for CloudFormation stacks, use `--disable-stack-prefix`.
 
 ```
 
-eksctl create cluster --name=cluster-6 --region=us-east-1 --stack-prefix=custom-
+eksctl create cluster --name=cluster-6 --region=us-east-1 --disable-stack-prefix
 
 ```
 

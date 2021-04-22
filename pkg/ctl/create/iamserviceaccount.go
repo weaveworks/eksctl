@@ -58,7 +58,7 @@ func createIAMServiceAccountCmdWithRunFunc(cmd *cmdutils.Cmd, runFunc func(cmd *
 		cmdutils.AddIAMServiceAccountFilterFlags(fs, &cmd.Include, &cmd.Exclude)
 		cmdutils.AddApproveFlag(fs, cmd)
 		cmdutils.AddRegionFlag(fs, &cmd.ProviderConfig)
-		cmdutils.AddStackPrefixFlag(fs, cfg.Metadata.StackPrefix)
+		cmdutils.AddDisableStackPrefixFlag(fs, &cfg.Metadata.DisableStackPrefix)
 		cmdutils.AddConfigFileFlag(fs, &cmd.ClusterConfigFile)
 		cmdutils.AddTimeoutFlag(fs, &cmd.ProviderConfig.WaitTimeout)
 	})

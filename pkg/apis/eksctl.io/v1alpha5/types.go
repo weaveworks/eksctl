@@ -172,9 +172,6 @@ const (
 )
 
 const (
-	// DefaultStackPrefix is the default prefix to use for all eksctl stacks
-	DefaultStackPrefix = "eksctl-"
-
 	// DefaultNodeType is the default instance type to use for nodes
 	DefaultNodeType = "m5.large"
 
@@ -507,9 +504,9 @@ type ClusterMeta struct {
 	// Annotations are arbitrary metadata ignored by `eksctl`.
 	// +optional
 	Annotations map[string]string `json:"annotations,omitempty"`
-	// StackPrefix is used to prefix all stacks created by `eksctl`.
+	// DisableStackPrefix stops eksctl from prefixing stacks with `eksctl-`.
 	// +optional
-	StackPrefix *string `json:"stackPrefix,omitempty"`
+	DisableStackPrefix bool `json:"disableStackPrefix,omitempty"`
 }
 
 // KubernetesNetworkConfig contains cluster networking options
@@ -679,12 +676,10 @@ func ClusterConfigTypeMeta() metav1.TypeMeta {
 // it doesn't include initial nodegroup, so user must
 // call NewNodeGroup to create one
 func NewClusterConfig() *ClusterConfig {
-	defaultStackPrefix := DefaultStackPrefix
 	cfg := &ClusterConfig{
 		TypeMeta: ClusterConfigTypeMeta(),
 		Metadata: &ClusterMeta{
-			Version:     DefaultVersion,
-			StackPrefix: &defaultStackPrefix,
+			Version: DefaultVersion,
 		},
 		IAM: NewClusterIAM(),
 		VPC: NewClusterVPC(),

@@ -168,9 +168,9 @@ func AddVersionFlag(fs *pflag.FlagSet, meta *api.ClusterMeta, extraUsageInfo str
 	fs.StringVar(&meta.Version, "version", meta.Version, usage)
 }
 
-// AddStackPrefixFlag adds common --stack-prefix flag
-func AddStackPrefixFlag(fs *pflag.FlagSet, stackPrefix *string) {
-	fs.StringVarP(stackPrefix, "stack-prefix", "", "eksctl-", "prefix to use for CloudFormation stacks")
+// AddStackPrefixFlag adds common --disable-stack-prefix flag
+func AddDisableStackPrefixFlag(fs *pflag.FlagSet, disableStackPrefix *bool) {
+	fs.BoolVar(disableStackPrefix, "disable-stack-prefix", false, "disable using prefix on CloudFormation stacks")
 }
 
 // AddWaitFlag adds common --wait flag

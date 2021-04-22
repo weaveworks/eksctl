@@ -50,7 +50,7 @@ func describeStacksCmd(cmd *cmdutils.Cmd) {
 	cmd.FlagSetGroup.InFlagSet("General", func(fs *pflag.FlagSet) {
 		cmdutils.AddClusterFlagWithDeprecated(fs, cfg.Metadata)
 		cmdutils.AddRegionFlag(fs, &cmd.ProviderConfig)
-		cmdutils.AddStackPrefixFlag(fs, cfg.Metadata.StackPrefix)
+		cmdutils.AddDisableStackPrefixFlag(fs, &cfg.Metadata.DisableStackPrefix)
 		fs.BoolVar(&all, "all", false, "include deleted stacks")
 		fs.BoolVar(&events, "events", false, "include stack events")
 		fs.BoolVar(&trail, "trail", false, "lookup CloudTrail events for the cluster")

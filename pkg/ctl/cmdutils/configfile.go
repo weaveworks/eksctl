@@ -43,6 +43,7 @@ var (
 		"version",
 		"cluster",
 		"namepace",
+		"disable-stack-prefix",
 	}
 	defaultFlagsIncompatibleWithoutConfigFile = []string{
 		"only",

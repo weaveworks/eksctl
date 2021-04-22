@@ -50,10 +50,8 @@ type NodeGroupStack struct {
 // makeNodeGroupStackName generates the name of the nodegroup stack identified by its name, isolated by the cluster this StackCollection operates on
 func (c *StackCollection) makeNodeGroupStackName(name string) string {
 	stackName := fmt.Sprintf("%s-nodegroup-%s", c.spec.Metadata.Name, name)
-	if c.spec.Metadata.StackPrefix == nil {
-		stackName = api.DefaultStackPrefix + stackName
-	} else {
-		stackName = *c.spec.Metadata.StackPrefix + stackName
+	if !c.spec.Metadata.DisableStackPrefix {
+		stackName = "eksctl-" + stackName
 	}
 	return strings.Replace(stackName, "_", "-", -1)
 }

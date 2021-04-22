@@ -454,6 +454,12 @@
           "x-intellij-html-description": "arbitrary metadata ignored by <code>eksctl</code>.",
           "default": "{}"
         },
+        "disableStackPrefix": {
+          "type": "boolean",
+          "description": "stops eksctl from prefixing stacks with `eksctl-`.",
+          "x-intellij-html-description": "stops eksctl from prefixing stacks with <code>eksctl-</code>.",
+          "default": "false"
+        },
         "name": {
           "type": "string",
           "description": "of the cluster",
@@ -463,11 +469,6 @@
           "type": "string",
           "description": "the AWS region hosting this cluster",
           "x-intellij-html-description": "the AWS region hosting this cluster"
-        },
-        "stackPrefix": {
-          "type": "string",
-          "description": "used to prefix all stacks created by `eksctl`.",
-          "x-intellij-html-description": "used to prefix all stacks created by <code>eksctl</code>."
         },
         "tags": {
           "additionalProperties": {
@@ -499,7 +500,7 @@
         "version",
         "tags",
         "annotations",
-        "stackPrefix"
+        "disableStackPrefix"
       ],
       "additionalProperties": false,
       "description": "contains general cluster information",

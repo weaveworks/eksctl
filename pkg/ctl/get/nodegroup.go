@@ -35,7 +35,7 @@ func getNodeGroupCmd(cmd *cmdutils.Cmd) {
 		fs.StringVar(&cfg.Metadata.Name, "cluster", "", "EKS cluster name")
 		fs.StringVarP(&ng.Name, "name", "n", "", "Name of the nodegroup")
 		cmdutils.AddRegionFlag(fs, &cmd.ProviderConfig)
-		cmdutils.AddStackPrefixFlag(fs, cfg.Metadata.StackPrefix)
+		cmdutils.AddDisableStackPrefixFlag(fs, &cfg.Metadata.DisableStackPrefix)
 		cmdutils.AddCommonFlagsForGetCmd(fs, &params.chunkSize, &params.output)
 		cmdutils.AddTimeoutFlag(fs, &cmd.ProviderConfig.WaitTimeout)
 	})

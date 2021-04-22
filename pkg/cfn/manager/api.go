@@ -32,7 +32,7 @@ const (
 	resourcesRootPath = "Resources"
 	outputsRootPath   = "Outputs"
 	mappingsRootPath  = "Mappings"
-	ourStackRegexFmt  = "^((eksctl|EKS)-%s)%s-((cluster|nodegroup-.+|addon-.+|fargate)|(VPC|ServiceRole|ControlPlane|DefaultNodeGroup))$"
+	ourStackRegexFmt  = "^%s-((cluster|nodegroup-.+|addon-.+|fargate)|(VPC|ServiceRole|ControlPlane|DefaultNodeGroup))$"
 	clusterStackRegex = ".*-cluster"
 )
 
@@ -381,7 +381,7 @@ func (c *StackCollection) ListClusterStackNames() ([]string, error) {
 
 // ListStacks gets all of CloudFormation stacks
 func (c *StackCollection) ListStacks(statusFilters ...string) ([]*Stack, error) {
-	return c.ListStacksMatching(fmtStacksRegexForCluster(c.spec.Metadata.StackPrefix, c.spec.Metadata.Name), statusFilters...)
+	return c.ListStacksMatching(fmtStacksRegexForCluster(c.spec.Metadata.Name, c.spec.Metadata.DisableStackPrefix), statusFilters...)
 }
 
 // StackStatusIsNotTransitional will return true when stack status is non-transitional
@@ -540,13 +540,12 @@ func (c *StackCollection) DeleteStackBySpecSync(s *Stack, errs chan error) error
 	return nil
 }
 
-func fmtStacksRegexForCluster(stackPrefix *string, name string) string {
-	ourStackPrefix := ""
-	if stackPrefix != nil {
-		ourStackPrefix = "|" + *stackPrefix
+func fmtStacksRegexForCluster(name string, disableStackPrefix bool) string {
+	prefix := strings.Replace(name, "_", "-", -1)
+	if !disableStackPrefix {
+		prefix = "(eksctl|EKS)-" + prefix
 	}
-	ourStackRegex := fmt.Sprintf(ourStackRegexFmt, ourStackPrefix, name)
-	return strings.Replace(ourStackRegex, "_", "-", -1)
+	return fmt.Sprintf(ourStackRegexFmt, prefix)
 }
 
 // DescribeStacks describes the existing stacks

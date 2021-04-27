@@ -115,6 +115,18 @@ func NewStackCollection(provider api.ClusterProvider, spec *api.ClusterConfig) *
 	}
 }
 
+// MakeStackName builds a consistent name for a CloudFormation stack
+func MakeStackName(disableStackPrefix bool, clusterName string, suffixes ...string) string {
+	stackName := clusterName
+	if !disableStackPrefix {
+		stackName = "eksctl-" + stackName
+	}
+	for _, suffix := range suffixes {
+		stackName = fmt.Sprintf("%s-%s", stackName, suffix)
+	}
+	return strings.Replace(stackName, "_", "-", -1)
+}
+
 // DoCreateStackRequest requests the creation of a CloudFormation stack
 func (c *StackCollection) DoCreateStackRequest(i *Stack, templateData TemplateData, tags, parameters map[string]string, withIAM bool, withNamedIAM bool) error {
 	input := &cloudformation.CreateStackInput{

@@ -23,11 +23,7 @@ func (c *StackCollection) MakeChangeSetName(action string) string {
 }
 
 func (c *StackCollection) MakeClusterStackName() string {
-	stackName := fmt.Sprintf("%s-cluster", c.spec.Metadata.Name)
-	if !c.spec.Metadata.DisableStackPrefix {
-		stackName = "eksctl-" + stackName
-	}
-	return strings.Replace(stackName, "_", "-", -1)
+	return MakeStackName(c.spec.Metadata.DisableStackPrefix, c.spec.Metadata.Name, "cluster")
 }
 
 // createClusterTask creates the cluster

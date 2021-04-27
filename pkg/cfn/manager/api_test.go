@@ -14,6 +14,24 @@ import (
 )
 
 var _ = Describe("StackCollection", func() {
+	Context("MakeStackName", func() {
+		It("replaces underscores with dashes", func() {
+			Expect(
+				MakeStackName(false, "my_test", "cluster"),
+			).To(Equal("eksctl-my-test-cluster"))
+		})
+
+		It("handles multiple suffixes", func() {
+			Expect(
+				MakeStackName(false, "testing", "addon", "iamserviceaccount", "my_namespace", "serviceaccount_name"),
+			).To(Equal("eksctl-testing-addon-iamserviceaccount-my-namespace-serviceaccount-name"))
+		})
+
+		It("disable stack prefix removes prefix", func() {
+			Expect(MakeStackName(true, "testing", "nodegroup", "ng-1")).To(Equal("testing-nodegroup-ng-1"))
+		})
+	})
+
 	Context("UpdateStack", func() {
 		It("succeeds if no changes required", func() {
 			// Order of AWS SDK invocation

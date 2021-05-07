@@ -504,6 +504,9 @@ type ClusterMeta struct {
 	// Annotations are arbitrary metadata ignored by `eksctl`.
 	// +optional
 	Annotations map[string]string `json:"annotations,omitempty"`
+	// DisableStackPrefix stops eksctl from prefixing stacks with `eksctl-`.
+	// +optional
+	DisableStackPrefix bool `json:"disableStackPrefix,omitempty"`
 }
 
 // KubernetesNetworkConfig contains cluster networking options

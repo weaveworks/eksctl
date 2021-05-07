@@ -50,6 +50,7 @@ func configureCreateFargateProfileCmd(cmd *cmdutils.Cmd) *fargate.CreateOptions 
 	cmd.FlagSetGroup.InFlagSet("General", func(fs *pflag.FlagSet) {
 		cmdutils.AddClusterFlag(fs, cmd.ClusterConfig.Metadata)
 		cmdutils.AddRegionFlag(fs, &cmd.ProviderConfig)
+		cmdutils.AddDisableStackPrefixFlag(fs, &cmd.ClusterConfig.Metadata.DisableStackPrefix)
 		cmdutils.AddConfigFileFlag(fs, &cmd.ClusterConfigFile)
 		cmdutils.AddTimeoutFlag(fs, &cmd.ProviderConfig.WaitTimeout)
 	})

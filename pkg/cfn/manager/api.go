@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go/service/autoscaling/autoscalingiface"
@@ -31,8 +32,8 @@ const (
 	resourcesRootPath = "Resources"
 	outputsRootPath   = "Outputs"
 	mappingsRootPath  = "Mappings"
-	ourStackRegexFmt  = "^(eksctl|EKS)-%s-((cluster|nodegroup-.+|addon-.+|fargate)|(VPC|ServiceRole|ControlPlane|DefaultNodeGroup))$"
-	clusterStackRegex = "eksctl-.*-cluster"
+	ourStackRegexFmt  = "^%s-((cluster|nodegroup-.+|addon-.+|fargate)|(VPC|ServiceRole|ControlPlane|DefaultNodeGroup))$"
+	clusterStackRegex = ".*-cluster"
 )
 
 var (
@@ -112,6 +113,18 @@ func NewStackCollection(provider api.ClusterProvider, spec *api.ClusterConfig) *
 		region:            provider.Region(),
 		waitTimeout:       provider.WaitTimeout(),
 	}
+}
+
+// MakeStackName builds a consistent name for a CloudFormation stack
+func MakeStackName(disableStackPrefix bool, clusterName string, suffixes ...string) string {
+	stackName := clusterName
+	if !disableStackPrefix {
+		stackName = "eksctl-" + stackName
+	}
+	for _, suffix := range suffixes {
+		stackName = fmt.Sprintf("%s-%s", stackName, suffix)
+	}
+	return strings.Replace(stackName, "_", "-", -1)
 }
 
 // DoCreateStackRequest requests the creation of a CloudFormation stack
@@ -380,7 +393,7 @@ func (c *StackCollection) ListClusterStackNames() ([]string, error) {
 
 // ListStacks gets all of CloudFormation stacks
 func (c *StackCollection) ListStacks(statusFilters ...string) ([]*Stack, error) {
-	return c.ListStacksMatching(fmtStacksRegexForCluster(c.spec.Metadata.Name), statusFilters...)
+	return c.ListStacksMatching(fmtStacksRegexForCluster(c.spec.Metadata.Name, c.spec.Metadata.DisableStackPrefix), statusFilters...)
 }
 
 // StackStatusIsNotTransitional will return true when stack status is non-transitional
@@ -539,8 +552,12 @@ func (c *StackCollection) DeleteStackBySpecSync(s *Stack, errs chan error) error
 	return nil
 }
 
-func fmtStacksRegexForCluster(name string) string {
-	return fmt.Sprintf(ourStackRegexFmt, name)
+func fmtStacksRegexForCluster(name string, disableStackPrefix bool) string {
+	prefix := strings.Replace(name, "_", "-", -1)
+	if !disableStackPrefix {
+		prefix = "(eksctl|EKS)-" + prefix
+	}
+	return fmt.Sprintf(ourStackRegexFmt, prefix)
 }
 
 // DescribeStacks describes the existing stacks

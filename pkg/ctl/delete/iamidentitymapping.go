@@ -30,6 +30,7 @@ func deleteIAMIdentityMappingCmd(cmd *cmdutils.Cmd) {
 		cmdutils.AddIAMIdentityMappingARNFlags(fs, cmd, &arn, "delete")
 		cmdutils.AddClusterFlagWithDeprecated(fs, cfg.Metadata)
 		cmdutils.AddRegionFlag(fs, &cmd.ProviderConfig)
+		cmdutils.AddDisableStackPrefixFlag(fs, &cfg.Metadata.DisableStackPrefix)
 		cmdutils.AddConfigFileFlag(fs, &cmd.ClusterConfigFile)
 		cmdutils.AddTimeoutFlag(fs, &cmd.ProviderConfig.WaitTimeout)
 	})

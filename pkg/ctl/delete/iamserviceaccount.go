@@ -48,6 +48,7 @@ func deleteIAMServiceAccountCmdWithRunFunc(cmd *cmdutils.Cmd, runFunc func(cmd *
 		fs.BoolVar(&onlyMissing, "only-missing", false, "Only delete iamserviceaccounts that are not defined in the given config file")
 		cmdutils.AddApproveFlag(fs, cmd)
 		cmdutils.AddRegionFlag(fs, &cmd.ProviderConfig)
+		cmdutils.AddDisableStackPrefixFlag(fs, &cfg.Metadata.DisableStackPrefix)
 		cmdutils.AddConfigFileFlag(fs, &cmd.ClusterConfigFile)
 
 		cmd.Wait = false

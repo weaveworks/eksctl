@@ -27,7 +27,6 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/onsi/gomega/gbytes"
 )
 
 var params *tests.Params
@@ -45,19 +44,19 @@ func TestE2E(t *testing.T) {
 
 var _ = Describe("(Integration) [non-eksctl cluster & nodegroup support]", func() {
 	var (
-		stackName, version, ng1, mng1, mng2 string
-		ctl                                 api.ClusterProvider
-		configFile                          *os.File
-		cfg                                 *api.ClusterConfig
-		kmsKeyARN                           *string
+		stackName, version, ng1, mng1 string
+		ctl                           api.ClusterProvider
+		configFile                    *os.File
+		cfg                           *api.ClusterConfig
+		kmsKeyARN                     *string
 	)
 
 	BeforeSuite(func() {
 		ng1 = "ng-1"
 		mng1 = "mng-1"
-		mng2 = "mng-2"
 		version = "1.19"
 		stackName = fmt.Sprintf("eksctl-%s", params.ClusterName)
+		params.ClusterName = "JKJKJK" + params.ClusterName
 		cfg = &api.ClusterConfig{
 			TypeMeta: api.ClusterConfigTypeMeta(),
 			Metadata: &api.ClusterMeta{
@@ -117,279 +116,6 @@ var _ = Describe("(Integration) [non-eksctl cluster & nodegroup support]", func(
 				"--verbose", "2",
 			)
 		Expect(cmd).To(RunSuccessfully())
-	})
-
-	It("supports creating managed nodegroups", func() {
-		cfg.ManagedNodeGroups = []*api.ManagedNodeGroup{{
-			NodeGroupBase: &api.NodeGroupBase{
-				Name: mng2,
-			}},
-		}
-		// write config file so that the nodegroup creates have access to the vpc spec
-		configData, err := json.Marshal(&cfg)
-		Expect(err).NotTo(HaveOccurred())
-		Expect(ioutil.WriteFile(configFile.Name(), configData, 0755)).To(Succeed())
-		cmd := params.EksctlCreateNodegroupCmd.
-			WithArgs(
-				"--config-file", configFile.Name(),
-				"--verbose", "2",
-			)
-		Expect(cmd).To(RunSuccessfully())
-	})
-
-	It("supports getting non-eksctl resources", func() {
-		By("getting clusters")
-		cmd := params.EksctlGetCmd.
-			WithArgs(
-				"clusters",
-				"--verbose", "2",
-			)
-		Expect(cmd).To(RunSuccessfullyWithOutputStringLines(
-			ContainElement(ContainSubstring(params.ClusterName)),
-		))
-
-		By("getting nodegroups")
-		cmd = params.EksctlGetCmd.
-			WithArgs(
-				"nodegroups",
-				"--cluster", params.ClusterName,
-				"--verbose", "2",
-			)
-		Expect(cmd).To(RunSuccessfullyWithOutputStringLines(
-			ContainElement(ContainSubstring(ng1)),
-		))
-		Expect(cmd).To(RunSuccessfullyWithOutputStringLines(
-			ContainElement(ContainSubstring(mng1)),
-		))
-		Expect(cmd).To(RunSuccessfullyWithOutputStringLines(
-			ContainElement(ContainSubstring(mng2)),
-		))
-	})
-
-	It("supports labels", func() {
-		By("setting labels on a managed nodegroup")
-		cmd := params.EksctlSetLabelsCmd.
-			WithArgs(
-				"--cluster", params.ClusterName,
-				"--nodegroup", mng1,
-				"--labels", "key=value",
-				"--verbose", "2",
-			)
-		Expect(cmd).To(RunSuccessfully())
-
-		By("getting labels for a managed nodegroup")
-		cmd = params.EksctlGetCmd.
-			WithArgs(
-				"labels",
-				"--cluster", params.ClusterName,
-				"--nodegroup", mng1,
-				"--verbose", "2",
-			)
-			// It sometimes takes forever for the above set to take effect
-		Eventually(func() *gbytes.Buffer { return cmd.Run().Out }, time.Minute*4).Should(gbytes.Say("key=value"))
-
-		By("unsetting labels on a managed nodegroup")
-		cmd = params.EksctlUnsetLabelsCmd.
-			WithArgs(
-				"--cluster", params.ClusterName,
-				"--nodegroup", mng1,
-				"--labels", "key",
-				"--verbose", "2",
-			)
-		Expect(cmd).To(RunSuccessfully())
-	})
-
-	It("supports IRSA", func() {
-		By("enabling OIDC")
-		cmd := params.EksctlUtilsCmd.
-			WithArgs(
-				"associate-iam-oidc-provider",
-				"--name", params.ClusterName,
-				"--approve",
-				"--verbose", "2",
-			)
-		Expect(cmd).To(RunSuccessfully())
-
-		By("creating an IAMServiceAccount")
-		cmd = params.EksctlCreateCmd.
-			WithArgs(
-				"iamserviceaccount",
-				"--cluster", params.ClusterName,
-				"--name", "test-sa",
-				"--namespace", "default",
-				"--attach-policy-arn",
-				"arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
-				"--approve",
-				"--verbose", "2",
-			)
-		Expect(cmd).To(RunSuccessfully())
-
-		By("getting IAMServiceAccounts")
-		cmd = params.EksctlGetCmd.
-			WithArgs(
-				"iamserviceaccounts",
-				"--cluster", params.ClusterName,
-				"--verbose", "2",
-			)
-		Expect(cmd).To(RunSuccessfullyWithOutputStringLines(
-			ContainElement(ContainSubstring("test-sa")),
-		))
-	})
-
-	It("supports cluster upgrades", func() {
-		By("upgrading the cluster")
-		cmd := params.EksctlUpgradeCmd.
-			WithArgs(
-				"cluster",
-				"--name", params.ClusterName,
-				"--version", "1.20",
-				"--timeout", "1h30m",
-				"--approve",
-				"--verbose", "2",
-			)
-		Expect(cmd).To(RunSuccessfully())
-	})
-
-	It("supports addons", func() {
-		By("creating an addon")
-		cmd := params.EksctlCreateCmd.
-			WithArgs(
-				"addon",
-				"--cluster", params.ClusterName,
-				"--name", "vpc-cni",
-				"--wait",
-				"--force",
-				"--version", "latest",
-				"--verbose", "2",
-			)
-		Expect(cmd).To(RunSuccessfully())
-
-		By("getting an addon")
-		cmd = params.EksctlGetCmd.
-			WithArgs(
-				"addons",
-				"--cluster", params.ClusterName,
-				"--verbose", "2",
-			)
-		Expect(cmd).To(RunSuccessfullyWithOutputStringLines(
-			ContainElement(ContainSubstring("vpc-cni")),
-		))
-		Expect(cmd).To(RunSuccessfullyWithOutputStringLines(
-			ContainElement(ContainSubstring("ACTIVE")),
-		))
-	})
-
-	It("supports fargate", func() {
-		By("creating a fargate profile")
-		cmd := params.EksctlCreateCmd.
-			WithArgs(
-				"fargateprofile",
-				"--cluster", params.ClusterName,
-				"--name", "fp-test",
-				"--namespace", "default",
-			)
-		Expect(cmd).To(RunSuccessfullyWithOutputStringLines(
-			ContainElement(SatisfyAll(ContainSubstring("created"), ContainSubstring("fp-test"))),
-		))
-
-		By("getting a fargate profile")
-		cmd = params.EksctlGetCmd.
-			WithArgs(
-				"fargateprofile",
-				"--cluster", params.ClusterName,
-				"--verbose", "2",
-			)
-		Expect(cmd).To(RunSuccessfullyWithOutputStringLines(
-			ContainElement(ContainSubstring("fp-test")),
-		))
-
-		By("deleting a fargate profile")
-		cmd = params.EksctlDeleteCmd.
-			WithArgs(
-				"fargateprofile",
-				"--cluster", params.ClusterName,
-				"--name", "fp-test",
-				"--wait",
-			)
-		Expect(cmd).To(RunSuccessfullyWithOutputStringLines(
-			ContainElement(SatisfyAll(ContainSubstring("deleted"), ContainSubstring("fp-test"))),
-		))
-	})
-
-	It("supports managed nodegroup upgrades", func() {
-		cmd := params.EksctlUpgradeCmd.
-			WithArgs(
-				"nodegroup",
-				"--name", mng1,
-				"--cluster", params.ClusterName,
-				"--kubernetes-version", "1.20",
-				"--timeout", "1h30m",
-				"--wait",
-				"--verbose", "2",
-			)
-		Expect(cmd).To(RunSuccessfully())
-	})
-
-	It("supports draining and scaling nodegroups", func() {
-		By("scaling a nodegroup")
-		cmd := params.EksctlScaleNodeGroupCmd.
-			WithArgs(
-				"--name", mng1,
-				"--nodes", "2",
-				"--nodes-max", "3",
-				"--cluster", params.ClusterName,
-				"--verbose", "2",
-			)
-		Expect(cmd).To(RunSuccessfully())
-
-		By("draining a nodegroup")
-		cmd = params.EksctlDrainNodeGroupCmd.
-			WithArgs(
-				"--cluster", params.ClusterName,
-				"--name", mng1,
-				"--verbose", "2",
-			)
-		Expect(cmd).To(RunSuccessfully())
-	})
-
-	It("supports deleting nodegroups", func() {
-		cmd := params.EksctlDeleteCmd.
-			WithArgs(
-				"nodegroup",
-				"--name", mng1,
-				"--cluster", params.ClusterName,
-				"--verbose", "2",
-			)
-		Expect(cmd).To(RunSuccessfully())
-	})
-
-	It("supports enabling KMS encryption", func() {
-		if params.SkipCreate {
-			Skip("not enabling KMS encryption because params.SkipCreate is true")
-		}
-		enableEncryptionCMD := func() Cmd {
-			return params.EksctlUtilsCmd.
-				WithTimeout(1*time.Hour).
-				WithArgs(
-					"enable-secrets-encryption",
-					"--cluster", params.ClusterName,
-					"--key-arn", *kmsKeyARN,
-				)
-		}
-
-		By(fmt.Sprintf("enabling KMS encryption on the cluster using key %q", *kmsKeyARN))
-		cmd := enableEncryptionCMD()
-		Expect(cmd).To(RunSuccessfullyWithOutputStringLines(
-			ContainElement(ContainSubstring("initiated KMS encryption")),
-			ContainElement(ContainSubstring("KMS encryption applied to all Secret resources")),
-		))
-
-		By("ensuring `enable-secrets-encryption` works when KMS encryption is already enabled on the cluster")
-		cmd = enableEncryptionCMD()
-		Expect(cmd).To(RunSuccessfullyWithOutputStringLines(
-			ContainElement(ContainSubstring("KMS encryption is already enabled on the cluster")),
-			ContainElement(ContainSubstring("KMS encryption applied to all Secret resources")),
-		))
 	})
 
 	It("supports deleting clusters", func() {

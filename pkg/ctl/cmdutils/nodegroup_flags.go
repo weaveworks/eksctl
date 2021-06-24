@@ -54,7 +54,7 @@ func AddCommonCreateNodeGroupFlags(fs *pflag.FlagSet, cmd *Cmd, ng *api.NodeGrou
 
 	fs.BoolVar(ng.DisablePodIMDS, "disable-pod-imds", false, "Blocks IMDS requests from non host networking pods")
 
-	fs.BoolVarP(&mngOptions.Managed, "managed", "", false, "Create EKS-managed nodegroup")
+	fs.BoolVarP(&mngOptions.Managed, "managed", "", true, "Create EKS-managed nodegroup")
 	fs.BoolVar(&mngOptions.Spot, "spot", false, "Create a spot nodegroup (managed nodegroups only)")
 	fs.StringSliceVar(&mngOptions.InstanceTypes, "instance-types", nil, "Comma-separated list of instance types (e.g., --instance-types=c3.large,c4.large,c5.large")
 }

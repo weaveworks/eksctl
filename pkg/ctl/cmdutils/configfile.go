@@ -416,6 +416,10 @@ func NewCreateNodeGroupLoader(cmd *Cmd, ng *api.NodeGroup, ngFilter *filter.Node
 		// Validate both filtered and unfiltered nodegroups
 		if mngOptions.Managed {
 			for _, ng := range l.ClusterConfig.ManagedNodeGroups {
+				if api.IsWindowsImage(ng.AMIFamily) {
+					return errors.New("Windows is not supported for managed nodegroups; eksctl now creates " +
+						"managed nodegroups by default, to use a self-managed nodegroup, pass --managed=false")
+				}
 				ngName := names.ForNodeGroup(ng.Name, l.NameArg)
 				if ngName == "" {
 					return ErrFlagAndArg("--name", ng.Name, l.NameArg)
